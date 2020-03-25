@@ -3,129 +3,97 @@ const express = require('express');
 const app = express();
 
 app.use(express.json());
-event = 'vote';
-vote = '';
-voted = false;
-const questions = [{
-    id: '1',
-    question: 'Question 1?',
-    answers: [{
-            id: '1',
-            answer: 'answer'
-        },
-        {
-            id: '2',
-            answer: 'answer'
-        },
-        {
-            id: '3',
-            answer: 'answer'
-        },
-        {
-            id: '4',
-            answer: 'answer'
-        },
-    ]
+
+const todos = [{
+    id: 1,
+    title: 'Lorem, ipsum dolor.',
+    completed: true
 }, {
-    id: '2',
-    question: 'Question 2?',
-    answers: [{
-            id: '1',
-            answer: '2 answer'
-        },
-        {
-            id: '2',
-            answer: '2 answer'
-        },
-        {
-            id: '3',
-            answer: '2 answer'
-        },
-    ],
+    id: 2,
+    title: 'Quis ut nam facilis et officia qui',
+    completed: false
 }, {
-    id: '3',
-    question: 'Question 3?',
-    answers: [{
-            id: '1',
-            answer: '3 answer'
-        },
-        {
-            id: '2',
-            answer: '3 answer'
-        },
-        {
-            id: '3',
-            answer: '3 answer'
-        },
-    ],
+    id: 3,
+    title: 'Fugiat veniam minus',
+    completed: true
+}, {
+    id: 4,
+    title: 'Lorem ipsum. Iste, repellendus! Doloremque',
+    completed: false
+}, {
+    id: 5,
+    title: 'Consequatur doloribus veritatis iure voluptates',
+    completed: true
+}, {
+    id: 6,
+    title: 'Dolor sit amet consectetur, adipisicing elit',
+    completed: true
+}, {
+    id: 7,
+    title: 'Exercitationem eos sed fugit quia voluptatibus optio',
+    completed: true
+}, {
+    id: 8,
+    title: 'Reiciendis veritatis eum nemo rem. ',
+    completed: true
+}, {
+    id: 9,
+    title: 'Perferendis cupiditate nulla sapiente at necessitatibus exercitationem non amet!',
+    completed: true
+}, {
+    id: 10,
+    title: 'Quisquam, hic alias.',
+    completed: true
+}, {
+    id: 11,
+    title: 'Nqulla sapiente at necessitatibus exercitationem',
+    completed: true
 }];
 
-app.get('/api/questions', (req, res) => {
-    res.send(questions);
+app.get('/api/todos', (req, res) => {
+    res.send(todos);
 });
 
-app.post('/api/questions', (req, res) => {
-    const { error } = validateQuestions(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const question = {
-        id: questions.length + 1,
-        question: req.body.question,
-        answers: [{
-                id: 1,
-                answer: req.body.answers[0].answer
-            },
-            {
-                id: 2,
-                answer: req.body.answers[1].answer
-            },
-            {
-                id: 3,
-                answer: req.body.answers[2].answer
-            },
-        ]
+app.post('/api/todos', (req, res) => {
+    if (!req.body.title) {
+        return res.status(400).send({
+            success: 'false',
+            message: 'title is required',
+        });
+    }
+    const todo = {
+        id: todos.length + 1,
+        title: req.body.title,
+        completed: false
     };
 
-    questions.push(question);
-    res.send(question);
+    todos.push(todo);
+    res.send(todo);
 });
 
-app.put('/api/questions/:id', (req, res) => {
-    const answer = questions.find(c => c.id === parseInt(req.params.id));
-    if (!answer) return res.status(404).send('The answer with the given ID was not found');
-
-    const { error } = validateQuestions(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-
-    answer.answer = req.body.answer;
-    res.send(answer);
+app.put('/api/todos/:id', (req, res) => {
+    const todo = todos.find(c => c.id === parseInt(req.params.id));
+    if (!todo) return res.status(404).send('The answer with the given ID was not found');
+    todo.completed = req.body.completed;
+    res.send(todo);
 });
 
-app.delete('/api/questions/:id', (req, res) => {
-    const question = questions.find(c => c.id === parseInt(req.params.id));
-    if (!question) return res.status(404).send('The question with the given ID was not found');
+app.delete('/api/todos/:id', (req, res) => {
+    const todo = todos.find(c => c.id === parseInt(req.params.id));
+    if (!todo) return res.status(404).send('The todo with the given ID was not found');
 
-    const index = questions.indexOf(question);
-    questions.splice(index, 1);
-    res.send(question);
+    const index = todos.indexOf(todo);
+    todos.splice(index, 1);
+    res.send(todo);
 });
 
-
-app.get('/api/questions/:id', (req, res) => {
-    const question = questions.find(c => c.id === parseInt(req.params.id));
-    if (!question) return res.status(404).send('The question with the given ID was not found');
-    res.send(question);
+app.get('/api/todos/:id', (req, res) => {
+    const todo = todos.find(c => c.id === parseInt(req.params.id));
+    console.log(req.params.id);
+    console.log(todos.id);
+    if (!todo) return res.status(404).send('The todo with the given ID was not found');
+    res.send(todo);
 });
-
-function validateQuestions(questions) {
-    const schema = {
-        question: Joi.string().min(3).required(),
-        answers: Joi.array()
-    };
-
-    return Joi.validate(questions, schema);
-}
-
 
 //PORT
 const port = process.env.PORT || 3000;
